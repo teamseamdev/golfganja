@@ -11,9 +11,17 @@ function Socials() {
           gap: "30px"
         }}
       >
-        <a href="#">YouTube</a>
-        <a href="#">Instagram</a>
-        <a href="#">Twitter</a>
+        <a href="https://youtube.com" target="_blank" rel="noreferrer">
+  YouTube
+</a>
+
+<a href="https://instagram.com" target="_blank" rel="noreferrer">
+  Instagram
+</a>
+
+<a href="https://twitter.com" target="_blank" rel="noreferrer">
+  Twitter
+</a>
       </div>
     </div>
   );
