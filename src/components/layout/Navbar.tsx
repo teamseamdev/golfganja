@@ -12,9 +12,7 @@ import type { Role } from "@/types/roles";
 const baseLinks = [
   { href: "/", label: "Home" },
   { href: "/live", label: "Live" },
-  { href: "/clips", label: "Clips" },
-  { href: "/podcasts", label: "Podcasts" },
-  { href: "/creators", label: "Creators" },
+  { href: "/media", label: "Media" },
   { href: "/socials", label: "Socials" },
   { href: "/shop", label: "Shop" },
 ];
@@ -49,7 +47,7 @@ export function Navbar() {
           {links.map((link) => (
             <NavLink
               key={link.href}
-              active={pathname === link.href}
+              active={isActivePath(pathname, link.href)}
               href={link.href}
               label={link.label}
             />
@@ -78,7 +76,7 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`rounded-md px-3 py-3 text-base font-bold transition ${
-                  pathname === link.href
+                  isActivePath(pathname, link.href)
                     ? "bg-primary-soft text-primary"
                     : "text-foreground hover:bg-surface"
                 }`}
@@ -95,6 +93,23 @@ export function Navbar() {
       ) : null}
     </header>
   );
+}
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/") {
+    return pathname === "/";
+  }
+
+  if (href === "/media") {
+    return (
+      pathname === "/media" ||
+      pathname.startsWith("/clips") ||
+      pathname.startsWith("/podcasts") ||
+      pathname.startsWith("/creators")
+    );
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function NavLink({

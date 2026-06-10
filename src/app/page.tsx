@@ -26,10 +26,10 @@ export default function Home() {
                 Enter live room
               </Link>
               <Link
-                href="/creator"
+                href="/media"
                 className="rounded-full border border-border px-6 py-3 text-center text-sm font-bold text-foreground transition hover:border-gold hover:text-gold"
               >
-                Creator dashboard
+                Explore media
               </Link>
             </div>
           </div>
@@ -56,7 +56,7 @@ export default function Home() {
               </div>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              {["Live chat", "Creator controls", "VOD clips"].map((item) => (
+              {["Live chat", "Media hub", "Social links"].map((item) => (
                 <div
                   key={item}
                   className="rounded-md border border-border bg-surface-soft px-4 py-3 text-sm font-medium text-muted"
