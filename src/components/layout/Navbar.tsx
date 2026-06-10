@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,10 +38,20 @@ export function Navbar() {
       <div className="mx-auto flex min-h-16 w-full max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 lg:px-10">
         <Link
           href="/"
-          className="shrink-0 text-base font-black uppercase tracking-[0.16em] text-foreground"
+          className="flex shrink-0 items-center gap-3 text-base font-black uppercase text-foreground"
           onClick={() => setOpen(false)}
         >
-          Golf N <span className="text-primary">Ganja</span>
+          <Image
+            src="/brand/gng-cut.png"
+            alt="Golf N Ganja"
+            width={44}
+            height={44}
+            className="h-11 w-11 rounded-full object-contain"
+            priority
+          />
+          <span className="hidden tracking-[0.12em] sm:inline">
+            Golf N <span className="text-primary">Ganja</span>
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-5 text-sm font-semibold text-muted lg:flex">
