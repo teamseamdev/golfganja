@@ -3,33 +3,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-5 sm:px-8 lg:px-10">
-        <nav className="flex items-center justify-between gap-4">
-          <Link href="/" className="text-lg font-semibold uppercase">
-            Golf N <span className="text-primary">Ganja</span>
-          </Link>
-          <div className="hidden items-center gap-6 text-sm text-muted md:flex">
-            <Link href="/live" className="transition hover:text-foreground">
-              Live
-            </Link>
-            <Link href="/clips" className="transition hover:text-foreground">
-              Clips
-            </Link>
-            <Link href="/podcasts" className="transition hover:text-foreground">
-              Podcasts
-            </Link>
-            <Link href="/creators" className="transition hover:text-foreground">
-              Creators
-            </Link>
-          </div>
-          <Link
-            href="/login"
-            className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary hover:text-primary"
-          >
-            Sign in
-          </Link>
-        </nav>
-
+      <section className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-7xl flex-col px-5 sm:px-8 lg:px-10">
         <div className="grid flex-1 items-center gap-10 py-14 lg:grid-cols-[1.08fr_0.92fr] lg:py-20">
           <div className="max-w-3xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary-soft/50 px-3 py-1 text-xs font-semibold uppercase text-primary">
