@@ -18,8 +18,9 @@ export async function createLiveKitToken({
   role,
 }: CreateLiveTokenInput) {
   const { apiKey, apiSecret } = getLiveKitConfig();
+  const participantIdentity = `${role === "creator" ? "streamer" : "viewer"}-${identity.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
   const token = new AccessToken(apiKey, apiSecret, {
-    identity,
+    identity: participantIdentity,
     name,
     ttl: "6h",
   });

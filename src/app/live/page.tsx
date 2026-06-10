@@ -21,13 +21,6 @@ export default function LivePage() {
 
         <section className="mt-8 grid gap-5 lg:grid-cols-[1fr_360px]">
           <LiveRoomClient roomName={defaultLiveRoomName} role="viewer" />
-          <aside className="min-h-[420px] rounded-lg border border-border bg-surface p-4">
-            <h2 className="text-lg font-semibold">Live chat</h2>
-            <p className="mt-2 text-sm leading-6 text-muted">
-              LiveKit data chat will mount here after auth and room tokens are
-              wired.
-            </p>
-          </aside>
         </section>
       </div>
     </main>

@@ -2,16 +2,11 @@
 
 import "@livekit/components-styles";
 
-import {
-  ControlBar,
-  GridLayout,
-  LiveKitRoom,
-  ParticipantTile,
-  RoomAudioRenderer,
-  useTracks,
-} from "@livekit/components-react";
-import { Track } from "livekit-client";
+import { LiveKitRoom } from "@livekit/components-react";
 import { useState } from "react";
+import { LiveChat } from "@/components/live/LiveChat";
+import { LivePlayer } from "@/components/live/LivePlayer";
+import { StreamerControls } from "@/components/live/StreamerControls";
 import type { LiveRole, LiveTokenResponse } from "@/types/live";
 
 type LiveRoomClientProps = {
@@ -52,17 +47,17 @@ export function LiveRoomClient({ roomName, role }: LiveRoomClientProps) {
 
   if (!connection) {
     return (
-      <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-border bg-surface p-6 text-center">
+      <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-border bg-surface p-6 text-center lg:min-h-[700px]">
         <p className="text-sm font-semibold uppercase text-primary">
           {role === "creator" ? "Creator access" : "Viewer access"}
         </p>
         <h2 className="mt-2 text-2xl font-semibold">
-          {role === "creator" ? "Start broadcast session" : "Join live room"}
+          {role === "creator" ? "Enter creator studio" : "Join live room"}
         </h2>
         <p className="mt-3 max-w-md text-sm leading-6 text-muted">
           {role === "creator"
-            ? "You will join with camera, microphone, and data permissions."
-            : "You will join as a viewer with video playback and chat data permissions only."}
+            ? "Join the room first, then use your custom controls to go live."
+            : "Viewers can watch the broadcast and send chat without publishing camera or mic."}
         </p>
         {error ? (
           <div className="mt-5 rounded-md border border-live/40 bg-live/10 p-3 text-sm">
@@ -75,7 +70,11 @@ export function LiveRoomClient({ roomName, role }: LiveRoomClientProps) {
           disabled={loading}
           onClick={connect}
         >
-          {loading ? "Connecting..." : role === "creator" ? "Go live" : "Watch live"}
+          {loading
+            ? "Connecting..."
+            : role === "creator"
+              ? "Enter studio"
+              : "Watch live"}
         </button>
       </div>
     );
@@ -83,40 +82,18 @@ export function LiveRoomClient({ roomName, role }: LiveRoomClientProps) {
 
   return (
     <LiveKitRoom
-      audio={role === "creator"}
-      video={role === "creator"}
+      audio={false}
+      video={false}
       token={connection.token}
       serverUrl={connection.url}
       connect
-      className="min-h-[420px] overflow-hidden rounded-lg border border-border bg-black"
+      className="contents"
     >
-      <LiveStage role={role} />
-      <RoomAudioRenderer />
-    </LiveKitRoom>
-  );
-}
-
-function LiveStage({ role }: { role: LiveRole }) {
-  const tracks = useTracks(
-    [
-      { source: Track.Source.Camera, withPlaceholder: true },
-      { source: Track.Source.ScreenShare, withPlaceholder: false },
-    ],
-    { onlySubscribed: false },
-  );
-
-  return (
-    <div className="flex min-h-[420px] flex-col">
-      <div className="flex-1 p-3">
-        <GridLayout tracks={tracks} className="h-full">
-          <ParticipantTile />
-        </GridLayout>
+      <LivePlayer />
+      <div className="flex flex-col gap-5">
+        {role === "creator" ? <StreamerControls canStream /> : null}
+        <LiveChat />
       </div>
-      {role === "creator" ? (
-        <div className="border-t border-border bg-surface/95 p-2">
-          <ControlBar controls={{ chat: false, screenShare: true }} />
-        </div>
-      ) : null}
-    </div>
+    </LiveKitRoom>
   );
 }
