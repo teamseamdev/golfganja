@@ -8,14 +8,21 @@ import { LiveChat } from "@/components/live/LiveChat";
 import { LivePlayer } from "@/components/live/LivePlayer";
 import { StreamerControls } from "@/components/live/StreamerControls";
 import type { LiveRole, LiveTokenResponse } from "@/types/live";
+import type { StreamState } from "@/types/stream";
 
 type LiveRoomClientProps = {
   roomName: string;
   role: LiveRole;
+  initialStream: StreamState;
 };
 
-export function LiveRoomClient({ roomName, role }: LiveRoomClientProps) {
+export function LiveRoomClient({
+  roomName,
+  role,
+  initialStream,
+}: LiveRoomClientProps) {
   const [connection, setConnection] = useState<LiveTokenResponse | null>(null);
+  const [stream, setStream] = useState(initialStream);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -91,9 +98,46 @@ export function LiveRoomClient({ roomName, role }: LiveRoomClientProps) {
     >
       <LivePlayer />
       <div className="flex flex-col gap-5">
-        {role === "creator" ? <StreamerControls canStream /> : null}
+        <StreamInfo stream={stream} />
+        {role === "creator" ? (
+          <StreamerControls
+            canStream
+            roomName={roomName}
+            stream={stream}
+            onStreamChange={setStream}
+          />
+        ) : null}
         <LiveChat />
       </div>
     </LiveKitRoom>
+  );
+}
+
+function StreamInfo({ stream }: { stream: StreamState }) {
+  const isLive = stream.status === "live";
+
+  return (
+    <section className="rounded-lg border border-border bg-surface p-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-black uppercase text-gold">
+            {stream.category}
+          </p>
+          <h2 className="mt-2 text-xl font-semibold">{stream.title}</h2>
+          <p className="mt-2 text-sm text-muted">
+            {stream.creatorName
+              ? `Hosted by ${stream.creatorName}`
+              : "Golf N Ganja creator stream"}
+          </p>
+        </div>
+        <span
+          className={`shrink-0 rounded-full px-3 py-1 text-xs font-black uppercase ${
+            isLive ? "bg-live text-white" : "bg-surface-soft text-muted"
+          }`}
+        >
+          {isLive ? "Live" : "Offline"}
+        </span>
+      </div>
+    </section>
   );
 }
