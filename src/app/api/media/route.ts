@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { hasPermission } from "@/lib/auth/permissions";
 import { getCurrentUser } from "@/lib/auth/session";
-import { createMediaItem, listMediaItems } from "@/lib/media/items";
+import {
+  createMediaItem,
+  listMediaItems,
+  updateMediaItemStatus,
+} from "@/lib/media/items";
 import type { MediaType } from "@/types/media";
 
 const mediaTypes = new Set(["clip", "podcast", "video", "vod"]);
@@ -53,6 +57,33 @@ export async function POST(request: Request) {
     creatorName: user.name,
     published: body.published,
     featured: body.featured,
+  });
+
+  return NextResponse.json({ item });
+}
+
+export async function PATCH(request: Request) {
+  const user = await getCurrentUser();
+
+  if (!user || !hasPermission(user.roles, "canManageContent")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = (await request.json().catch(() => null)) as {
+    id?: string;
+    published?: boolean;
+    featured?: boolean;
+  } | null;
+  const id = body?.id?.trim();
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing media id" }, { status: 400 });
+  }
+
+  const item = await updateMediaItemStatus({
+    id,
+    published: body?.published,
+    featured: body?.featured,
   });
 
   return NextResponse.json({ item });

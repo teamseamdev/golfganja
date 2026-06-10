@@ -73,3 +73,37 @@ export async function createMediaItem(input: CreateMediaItemInput) {
 
   return item;
 }
+
+export async function updateMediaItemStatus({
+  id,
+  featured,
+  published,
+}: {
+  id: string;
+  featured?: boolean;
+  published?: boolean;
+}) {
+  const db = getDb();
+
+  if (!db) {
+    throw new Error("Firestore is not configured");
+  }
+
+  const updates: Partial<Pick<MediaItem, "featured" | "published" | "updatedAt">> = {
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (typeof featured === "boolean") {
+    updates.featured = featured;
+  }
+
+  if (typeof published === "boolean") {
+    updates.published = published;
+  }
+
+  const ref = db.collection("media").doc(id);
+  await ref.set(updates, { merge: true });
+  const snapshot = await ref.get();
+
+  return snapshot.data() as MediaItem;
+}
