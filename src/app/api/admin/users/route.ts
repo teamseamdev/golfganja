@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { hasPermission } from "@/lib/auth/permissions";
 import { getCurrentUser } from "@/lib/auth/session";
-import { listUsers, updateUserAdminFields } from "@/lib/firebase/users";
+import { getUserById, listUsers, updateUserAdminFields } from "@/lib/firebase/users";
 import { roles as allowedRoles } from "@/config/roles";
 import type { Role } from "@/types/roles";
+
+const protectedRoles = ["admin", "owner"] satisfies Role[];
 
 function normalizeRoles(value: unknown): Role[] | undefined {
   if (!Array.isArray(value)) {
@@ -15,6 +17,12 @@ function normalizeRoles(value: unknown): Role[] | undefined {
   );
 
   return normalized.length ? normalized : ["viewer"];
+}
+
+function hasProtectedRoleChange(currentRoles: Role[], nextRoles: Role[]) {
+  return protectedRoles.some(
+    (role) => currentRoles.includes(role) !== nextRoles.includes(role),
+  );
 }
 
 export async function GET() {
@@ -47,10 +55,42 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Missing user id" }, { status: 400 });
   }
 
+  const targetUser = await getUserById(userId);
+  const normalizedRoles = normalizeRoles(body?.roles);
+
+  if (normalizedRoles && targetUser) {
+    const actorIsOwner = user.roles.includes("owner");
+
+    if (hasProtectedRoleChange(targetUser.roles, normalizedRoles) && !actorIsOwner) {
+      return NextResponse.json(
+        { error: "Only owners can change admin or owner roles." },
+        { status: 403 },
+      );
+    }
+
+    if (
+      user.id === userId &&
+      targetUser.roles.includes("owner") &&
+      !normalizedRoles.includes("owner")
+    ) {
+      return NextResponse.json(
+        { error: "You cannot remove your own owner role." },
+        { status: 400 },
+      );
+    }
+  }
+
+  if (user.id === userId && typeof body?.banned === "boolean" && body.banned) {
+    return NextResponse.json(
+      { error: "You cannot ban your own account." },
+      { status: 400 },
+    );
+  }
+
   const updatedUser = await updateUserAdminFields({
     userId,
     banned: body?.banned,
-    roles: normalizeRoles(body?.roles),
+    roles: normalizedRoles,
   });
 
   return NextResponse.json({ user: updatedUser });

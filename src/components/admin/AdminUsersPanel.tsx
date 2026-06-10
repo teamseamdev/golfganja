@@ -5,10 +5,19 @@ import { roles as allRoles } from "@/config/roles";
 import type { Role } from "@/types/roles";
 import type { AppUser } from "@/types/user";
 
-export function AdminUsersPanel({ initialUsers }: { initialUsers: AppUser[] }) {
+export function AdminUsersPanel({
+  currentUserId,
+  currentUserRoles,
+  initialUsers,
+}: {
+  currentUserId: string;
+  currentUserRoles: Role[];
+  initialUsers: AppUser[];
+}) {
   const [users, setUsers] = useState(initialUsers);
   const [message, setMessage] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const isOwner = currentUserRoles.includes("owner");
 
   async function updateUser(
     appUser: AppUser,
@@ -47,6 +56,7 @@ export function AdminUsersPanel({ initialUsers }: { initialUsers: AppUser[] }) {
       <h2 className="text-xl font-semibold">Users</h2>
       <p className="mt-2 text-sm leading-6 text-muted">
         Manage app roles for the small internal team and ban access when needed.
+        Only owners can grant or remove admin access.
       </p>
 
       {message ? <p className="mt-4 text-sm text-muted">{message}</p> : null}
@@ -71,6 +81,11 @@ export function AdminUsersPanel({ initialUsers }: { initialUsers: AppUser[] }) {
                   <div className="flex flex-wrap gap-2 lg:justify-end">
                     {allRoles.map((role) => {
                       const active = appUser.roles.includes(role);
+                      const isProtectedRole = role === "admin" || role === "owner";
+                      const isSelfOwnerRole =
+                        appUser.id === currentUserId && role === "owner" && active;
+                      const canChangeRole =
+                        (!isProtectedRole || isOwner) && !isSelfOwnerRole;
                       const requestedRoles = active
                         ? appUser.roles.filter((item) => item !== role)
                         : [...appUser.roles, role];
@@ -87,7 +102,14 @@ export function AdminUsersPanel({ initialUsers }: { initialUsers: AppUser[] }) {
                               : "bg-surface-soft text-muted hover:text-foreground"
                           }`}
                           type="button"
-                          disabled={loadingId === appUser.id}
+                          disabled={loadingId === appUser.id || !canChangeRole}
+                          title={
+                            !canChangeRole
+                              ? isSelfOwnerRole
+                                ? "You cannot remove your own owner role."
+                                : "Only owners can change this role."
+                              : undefined
+                          }
                           onClick={() => updateUser(appUser, { roles: nextRoles })}
                         >
                           {role}
@@ -103,7 +125,12 @@ export function AdminUsersPanel({ initialUsers }: { initialUsers: AppUser[] }) {
                         : "border border-live/60 text-live hover:bg-live hover:text-white"
                     }`}
                     type="button"
-                    disabled={loadingId === appUser.id}
+                    disabled={loadingId === appUser.id || appUser.id === currentUserId}
+                    title={
+                      appUser.id === currentUserId
+                        ? "You cannot ban your own account."
+                        : undefined
+                    }
                     onClick={() => updateUser(appUser, { banned: !appUser.banned })}
                   >
                     {appUser.banned ? "Banned" : "Ban user"}

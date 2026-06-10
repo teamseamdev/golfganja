@@ -3,7 +3,7 @@ import { requirePermission } from "@/lib/auth/require-permission";
 import { listUsers } from "@/lib/firebase/users";
 
 export default async function AdminUsersPage() {
-  await requirePermission("canManageUsers");
+  const currentUser = await requirePermission("canManageUsers");
   const users = await listUsers();
 
   return (
@@ -15,7 +15,11 @@ export default async function AdminUsersPage() {
           Manage access for owners, admins, creators, moderators, and viewers.
         </p>
 
-        <AdminUsersPanel initialUsers={users} />
+        <AdminUsersPanel
+          currentUserId={currentUser.id}
+          currentUserRoles={currentUser.roles}
+          initialUsers={users}
+        />
       </div>
     </main>
   );

@@ -110,6 +110,22 @@ export async function getUserByDiscordId(discordId: string) {
   return snapshot.data() as AppUser;
 }
 
+export async function getUserById(userId: string) {
+  const db = getDb();
+
+  if (!db) {
+    return null;
+  }
+
+  const snapshot = await db.collection("users").doc(userId).get();
+
+  if (!snapshot.exists) {
+    return null;
+  }
+
+  return snapshot.data() as AppUser;
+}
+
 export async function listUsers(limit = 100) {
   const db = getDb();
 
