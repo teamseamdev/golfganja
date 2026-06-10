@@ -1,4 +1,6 @@
 import { DiscordSignInButton } from "@/components/auth/DiscordSignInButton";
+import { getCurrentSession } from "@/lib/auth/session";
+import { redirect } from "next/navigation";
 
 type LoginPageProps = {
   searchParams: Promise<{
@@ -7,7 +9,12 @@ type LoginPageProps = {
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const session = await getCurrentSession();
   const { error } = await searchParams;
+
+  if (session?.user && !error) {
+    redirect("/live");
+  }
 
   return (
     <main className="grid min-h-screen place-items-center bg-background px-5 text-foreground">
