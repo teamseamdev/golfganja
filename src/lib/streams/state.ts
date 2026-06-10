@@ -40,6 +40,26 @@ export async function getStreamState(roomName: string) {
   };
 }
 
+export async function listRecentStreams(limit = 10) {
+  const db = getDb();
+
+  if (!db) {
+    return [];
+  }
+
+  const snapshot = await db
+    .collection("streams")
+    .orderBy("updatedAt", "desc")
+    .limit(limit)
+    .get();
+
+  return snapshot.docs.map((doc) => ({
+    ...getFallbackStreamState(doc.id),
+    ...(doc.data() as Partial<StreamState>),
+    roomName: doc.id,
+  }));
+}
+
 export async function startStreamState({
   roomName,
   title,

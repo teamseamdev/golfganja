@@ -7,7 +7,11 @@ import { endStreamState } from "@/lib/streams/state";
 export async function POST(request: Request) {
   const user = await getCurrentUser();
 
-  if (!user || !hasPermission(user.roles, "canGoLive")) {
+  if (
+    !user ||
+    (!hasPermission(user.roles, "canGoLive") &&
+      !hasPermission(user.roles, "canManageStreams"))
+  ) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
