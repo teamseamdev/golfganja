@@ -32,6 +32,18 @@ export async function listMediaItems(limit = 24) {
   return snapshot.docs.map((doc) => doc.data() as MediaItem);
 }
 
+export async function listPublishedMediaItems(limit = 24) {
+  const items = await listMediaItems(limit);
+
+  return items.filter((item) => item.published);
+}
+
+export async function listPublishedMediaItemsByType(type: MediaType, limit = 24) {
+  const items = await listPublishedMediaItems(limit);
+
+  return items.filter((item) => item.type === type);
+}
+
 export async function createMediaItem(input: CreateMediaItemInput) {
   const db = getDb();
 

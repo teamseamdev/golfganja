@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { CalendarDays, Clapperboard, Mic2, Plus, Radio, Star, UserRound } from "lucide-react";
+import { Clapperboard, Mic2, Plus, Radio, Video } from "lucide-react";
+import { PublicMediaGrid } from "@/components/media/PublicMediaGrid";
 import { hasPermission } from "@/lib/auth/permissions";
 import { getCurrentUser } from "@/lib/auth/session";
+import { listPublishedMediaItems } from "@/lib/media/items";
 
 const mediaSections = [
   {
@@ -17,28 +19,10 @@ const mediaSections = [
     icon: Mic2,
   },
   {
-    href: "/creators",
-    label: "Creators",
-    description: "Creator profiles and future multi-creator media hubs.",
-    icon: UserRound,
-  },
-];
-
-const featuredPlaceholders = [
-  {
-    label: "Featured clip",
-    title: "Best shot of the week",
-    meta: "Clip slot",
-  },
-  {
-    label: "Latest podcast",
-    title: "Guest interview drop",
-    meta: "Podcast slot",
-  },
-  {
-    label: "Upcoming stream",
-    title: "Front nine live session",
-    meta: "Schedule slot",
+    href: "#vods",
+    label: "VODs",
+    description: "Livestream archives and full video sessions.",
+    icon: Video,
   },
 ];
 
@@ -46,6 +30,9 @@ export default async function MediaPage() {
   const user = await getCurrentUser();
   const roles = user?.roles ?? [];
   const canManageContent = hasPermission(roles, "canManageContent");
+  const items = await listPublishedMediaItems();
+  const featured = items.filter((item) => item.featured).slice(0, 3);
+  const recent = items.slice(0, 9);
 
   return (
     <main className="min-h-screen bg-background px-5 py-8 text-foreground sm:px-8">
@@ -54,12 +41,11 @@ export default async function MediaPage() {
           <div>
             <p className="text-sm font-semibold uppercase text-primary">Media</p>
             <h1 className="mt-2 text-3xl font-semibold">
-              Clips, podcasts, and creators
+              Clips, podcasts, and videos
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-              The public hub for Golf N Ganja content. As uploads come online,
-              this page will surface live clips, podcast episodes, VODs,
-              schedules, and creator profiles.
+              The public hub for Golf N Ganja content: live clips, podcast
+              episodes, videos, and future livestream archives.
             </p>
           </div>
 
@@ -74,33 +60,13 @@ export default async function MediaPage() {
           ) : null}
         </div>
 
-        <section className="mt-8 grid gap-4 lg:grid-cols-3">
-          {featuredPlaceholders.map((item) => (
-            <div
-              key={item.label}
-              className="min-h-52 rounded-lg border border-border bg-surface p-5"
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-black uppercase text-gold">
-                  {item.label}
-                </p>
-                <Star size={17} className="text-gold" />
-              </div>
-              <div className="mt-14">
-                <h2 className="text-2xl font-semibold">{item.title}</h2>
-                <p className="mt-2 text-sm text-muted">{item.meta}</p>
-              </div>
-            </div>
-          ))}
-        </section>
-
-        <section className="mt-5 grid gap-4 md:grid-cols-3">
+        <section className="mt-8 grid gap-4 md:grid-cols-3">
           {mediaSections.map((section) => {
             const Icon = section.icon;
 
             return (
               <Link
-                key={section.href}
+                key={section.label}
                 href={section.href}
                 className="rounded-lg border border-border bg-surface p-5 transition hover:border-primary"
               >
@@ -116,28 +82,17 @@ export default async function MediaPage() {
           })}
         </section>
 
-        <section className="mt-5 grid gap-4 lg:grid-cols-[1fr_360px]">
-          <div className="rounded-lg border border-border bg-surface p-5">
-            <div className="flex items-center gap-3">
-              <Radio size={19} className="text-primary" />
-              <h2 className="text-lg font-semibold">Livestream archive</h2>
-            </div>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
-              VODs and livestream archives will appear here after stream
-              lifecycle tracking and storage are connected.
-            </p>
+        <section className="mt-8">
+          <div className="mb-4 flex items-center gap-3">
+            <Radio size={19} className="text-gold" />
+            <h2 className="text-xl font-semibold">Featured media</h2>
           </div>
+          <PublicMediaGrid emptyTitle="No featured media yet" items={featured} />
+        </section>
 
-          <div className="rounded-lg border border-border bg-surface p-5">
-            <div className="flex items-center gap-3">
-              <CalendarDays size={19} className="text-gold" />
-              <h2 className="text-lg font-semibold">Schedule</h2>
-            </div>
-            <p className="mt-3 text-sm leading-6 text-muted">
-              Upcoming golf rounds, interviews, and community streams will be
-              listed here.
-            </p>
-          </div>
+        <section id="vods" className="mt-8">
+          <h2 className="mb-4 text-xl font-semibold">Latest media</h2>
+          <PublicMediaGrid emptyTitle="No published media yet" items={recent} />
         </section>
       </div>
     </main>
