@@ -3,34 +3,18 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { getCurrentUser } from "@/lib/auth/session";
 import { sendPushNotification } from "@/lib/notifications/send";
 
-export async function POST(request: Request) {
+export async function POST() {
   const user = await getCurrentUser();
 
-  if (!user || !hasPermission(user.roles, "canSendNotifications")) {
+  if (!user || !hasPermission(user.roles, "canGoLive")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = (await request.json().catch(() => null)) as {
-    title?: string;
-    message?: string;
-    url?: string;
-  } | null;
-  const title = body?.title?.trim();
-  const message = body?.message?.trim();
-  const url = body?.url?.trim() || "/live";
-
-  if (!title || !message) {
-    return NextResponse.json(
-      { error: "Missing title or message" },
-      { status: 400 },
-    );
-  }
-
   const result = await sendPushNotification({
-    type: "broadcast",
-      title,
-    message,
-    url,
+    type: "live",
+    title: "Golf N Ganja is live",
+    message: `${user.name ?? "The creator"} just went live.`,
+    url: "/live",
   });
 
   if ("error" in result) {

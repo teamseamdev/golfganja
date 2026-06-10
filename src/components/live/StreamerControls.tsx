@@ -15,6 +15,7 @@ export function StreamerControls({ canStream }: StreamerControlsProps) {
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [usingFrontCamera, setUsingFrontCamera] = useState(true);
   const [participantCount, setParticipantCount] = useState(1);
+  const [liveNotificationSent, setLiveNotificationSent] = useState(false);
 
   useEffect(() => {
     const updateCount = () => {
@@ -54,6 +55,15 @@ export function StreamerControls({ canStream }: StreamerControlsProps) {
       }
 
       setLive(true);
+
+      if (!liveNotificationSent) {
+        fetch("/api/notifications/live", {
+          method: "POST",
+        }).catch((error) => {
+          console.error("Live notification failed", error);
+        });
+        setLiveNotificationSent(true);
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to start stream";
@@ -69,6 +79,7 @@ export function StreamerControls({ canStream }: StreamerControlsProps) {
     setMicEnabled(false);
     setCameraEnabled(false);
     setLive(false);
+    setLiveNotificationSent(false);
   }
 
   async function toggleMic() {
