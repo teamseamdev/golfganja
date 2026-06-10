@@ -37,19 +37,14 @@ export async function sendPushNotification({
 
   const response = await getMessaging().sendEachForMulticast({
     tokens,
-    notification: {
+    data: {
       title,
       body: message,
-    },
-    data: {
       url,
     },
     webpush: {
       headers: {
         Urgency: "high",
-      },
-      notification: {
-        icon: "/favicon.ico",
       },
     },
   });

@@ -17,8 +17,8 @@ messaging.onBackgroundMessage((payload) => {
   const notification = payload.notification || {};
   const data = payload.data || {};
 
-  self.registration.showNotification(notification.title || "Golf N Ganja", {
-    body: notification.body || "",
+  self.registration.showNotification(notification.title || data.title || "Golf N Ganja", {
+    body: notification.body || data.body || "",
     icon: "/favicon.ico",
     data
   });
