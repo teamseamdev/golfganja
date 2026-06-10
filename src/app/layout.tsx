@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "@/components/auth/SessionProvider";
 import { Navbar } from "@/components/layout/Navbar";
+import { PushNotificationButton } from "@/components/notifications/PushNotificationButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -42,6 +43,7 @@ export default function RootLayout({
         <SessionProvider>
           <Navbar />
           {children}
+          <PushNotificationButton />
         </SessionProvider>
       </body>
     </html>
