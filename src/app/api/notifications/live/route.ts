@@ -10,10 +10,11 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const creatorName = user.name ?? "Golf N Ganja";
   const result = await sendPushNotification({
     type: "live",
-    title: "Golf N Ganja is live",
-    message: `${user.name ?? "The creator"} just went live.`,
+    title: `${creatorName} is live`,
+    message: "Tap to watch the Golf N Ganja livestream.",
     url: "/live",
   });
 
