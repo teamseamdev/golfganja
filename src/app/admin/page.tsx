@@ -17,7 +17,6 @@ export default async function AdminPage() {
             ["Users", "/admin/users"],
             ["Live streams", "/admin/live"],
             ["Notifications", "/admin/notifications"],
-            ["Moderation", "/admin/moderation"],
             ["Content", "/admin/content"],
             ["Analytics", "/admin/analytics"],
           ].map(([label, href]) => (

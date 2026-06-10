@@ -109,3 +109,53 @@ export async function getUserByDiscordId(discordId: string) {
 
   return snapshot.data() as AppUser;
 }
+
+export async function listUsers(limit = 100) {
+  const db = getDb();
+
+  if (!db) {
+    return [];
+  }
+
+  const snapshot = await db
+    .collection("users")
+    .orderBy("lastSeenAt", "desc")
+    .limit(limit)
+    .get();
+
+  return snapshot.docs.map((doc) => doc.data() as AppUser);
+}
+
+export async function updateUserAdminFields({
+  banned,
+  roles,
+  userId,
+}: {
+  banned?: boolean;
+  roles?: Role[];
+  userId: string;
+}) {
+  const db = getDb();
+
+  if (!db) {
+    throw new Error("Firestore is not configured");
+  }
+
+  const updates: Partial<Pick<AppUser, "banned" | "roles" | "updatedAt">> = {
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (typeof banned === "boolean") {
+    updates.banned = banned;
+  }
+
+  if (roles) {
+    updates.roles = roles;
+  }
+
+  const ref = db.collection("users").doc(userId);
+  await ref.set(updates, { merge: true });
+  const snapshot = await ref.get();
+
+  return snapshot.data() as AppUser;
+}
